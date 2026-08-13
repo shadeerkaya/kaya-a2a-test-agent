@@ -12,6 +12,21 @@ import gradio as gr
 
 from a2a_agent import BASE, app as a2a_app
 
+# HF provisions some Spaces on ZeroGPU, which aborts startup with
+# "No @spaces.GPU function detected during startup" unless the app declares one.
+# This agent is CPU-only, so declare a no-op purely to satisfy that check. On
+# CPU hardware `spaces` is not installed and this is skipped entirely.
+try:
+    import spaces
+
+    @spaces.GPU(duration=1)
+    def _zerogpu_probe() -> str:
+        """Never called. Present only so ZeroGPU startup validation passes."""
+        return "ok"
+
+except ImportError:
+    pass
+
 with gr.Blocks(title="KAYA A2A Test Agent") as demo:
     gr.Markdown(
         f"""

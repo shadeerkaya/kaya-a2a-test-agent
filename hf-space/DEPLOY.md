@@ -2,31 +2,36 @@
 
 Two paths. Both are free; each has one manual step I could not do for you.
 
-## Current state
+## Current state — LIVE
 
-* GitHub repo (source of truth): <https://github.com/shadeerkaya/kaya-a2a-test-agent>
-* HF Space created and files uploaded: <https://huggingface.co/spaces/shadeer/kaya-a2a-test-agent>
-  * `A2A_TOKEN` secret set
-  * **Blocked:** the Space was provisioned on **ZeroGPU** hardware, which requires a
-    `@spaces.GPU`-decorated function. This is a CPU-only app, so HF reports
-    `RUNTIME_ERROR: No @spaces.GPU function detected during startup`.
-    The hardware selector kept reporting `requested: zero-a10g` and would not switch.
+* GitHub repo: <https://github.com/shadeerkaya/kaya-a2a-test-agent>
+* **Deployed: <https://shadeer-kaya-a2a-test-agent.hf.space>** — 13/13 acceptance passing
+  against the live URL.
 
-## Path A -- fix the HF Space (free, ~2 min)
+| | Card URL (GET, authoring) | Endpoint (POST, execution) | Auth |
+|---|---|---|---|
+| Open | `https://shadeer-kaya-a2a-test-agent.hf.space/open/.well-known/agent-card.json` | `.../open/` | none |
+| Secure | `https://shadeer-kaya-a2a-test-agent.hf.space/secure/.well-known/agent-card.json` | `.../secure/` | Bearer `$A2A_TOKEN` |
 
-1. Open <https://huggingface.co/spaces/shadeer/kaya-a2a-test-agent/settings>
-2. Under **Space Hardware**, click **CPU basic** (2 vCPU / 16 GB, Free)
-3. Click **Confirm new hardware**, and re-check the page shows CPU basic afterwards
-   (the switch silently no-ops while the Space sits in RUNTIME_ERROR -- if it does,
-   hit **Factory rebuild** on the same page first, then set the hardware)
-4. Wait for the Space to reach **Running**
-5. Verify:
+Re-verify any time:
 
 ```bash
 BASE=https://shadeer-kaya-a2a-test-agent.hf.space \
-  TOKEN=<the A2A_TOKEN from Settings -> Variables and secrets> \
+  TOKEN=<A2A_TOKEN from Space Settings -> Variables and secrets> \
   bash acceptance.sh     # expect: 13 passed, 0 failed
 ```
+
+### The ZeroGPU trap, and the fix that shipped
+
+The Space was provisioned on **ZeroGPU** hardware, which aborts startup with
+`No @spaces.GPU function detected during startup` unless the app declares such a
+function. The build log gives it away: HF injects `torch` and `spaces==0.51.1`
+into the image on ZeroGPU, which a CPU-only app never asks for.
+
+Switching hardware to CPU basic in the UI would also fix it, but the setting would
+not persist while the Space sat in `RUNTIME_ERROR`. So `app.py` instead declares a
+no-op `@spaces.GPU` probe guarded by `try: import spaces / except ImportError`, so
+it satisfies ZeroGPU and is skipped entirely on CPU hardware. That runs anywhere.
 
 ## Path B -- Render (needs a card, no Gradio layer)
 
