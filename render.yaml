@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: kaya-a2a-test-agent
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: A2A_TOKEN
+        generateValue: true          # random token, read it from the dashboard
+      - key: PUBLIC_BASE_URL
+        sync: false                  # set to https://<service>.onrender.com after first deploy
