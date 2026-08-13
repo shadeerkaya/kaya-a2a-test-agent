@@ -39,9 +39,11 @@ TOKEN = os.getenv("A2A_TOKEN", "secret123")
 # fine and then fails to invoke it. Render injects RENDER_EXTERNAL_URL, Koyeb
 # injects KOYEB_PUBLIC_DOMAIN - prefer those so no manual step is needed.
 _koyeb = os.getenv("KOYEB_PUBLIC_DOMAIN")
+_hf = os.getenv("SPACE_HOST")  # Hugging Face Spaces
 BASE = (
     os.getenv("PUBLIC_BASE_URL")
     or os.getenv("RENDER_EXTERNAL_URL")
+    or (f"https://{_hf}" if _hf else None)
     or (f"https://{_koyeb}" if _koyeb else None)
     or "http://localhost:10000"
 ).rstrip("/")
