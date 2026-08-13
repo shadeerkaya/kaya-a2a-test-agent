@@ -34,8 +34,17 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 TOKEN = os.getenv("A2A_TOKEN", "secret123")
-# Public base URL once deployed, e.g. https://kaya-a2a-test.onrender.com
-BASE = os.getenv("PUBLIC_BASE_URL", "http://localhost:10000").rstrip("/")
+
+# The card's `url` field must be the real public URL, or KAYA fetches the card
+# fine and then fails to invoke it. Render injects RENDER_EXTERNAL_URL, Koyeb
+# injects KOYEB_PUBLIC_DOMAIN - prefer those so no manual step is needed.
+_koyeb = os.getenv("KOYEB_PUBLIC_DOMAIN")
+BASE = (
+    os.getenv("PUBLIC_BASE_URL")
+    or os.getenv("RENDER_EXTERNAL_URL")
+    or (f"https://{_koyeb}" if _koyeb else None)
+    or "http://localhost:10000"
+).rstrip("/")
 
 
 class TestAgent(AgentExecutor):

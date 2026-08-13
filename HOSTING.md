@@ -60,29 +60,25 @@ KAYA's node. Use Vercel for the v0 prototype frontend, not for this.
 
 ## Deploy sequence (Render)
 
-```bash
-cd _bmad-output/a2a-test-agent
-git init && git add . && git commit -m "A2A test agent"
-# push to a GitHub repo, then in Render: New Web Service → pick the repo
-```
+Already on GitHub: <https://github.com/shadeerkaya/kaya-a2a-test-agent>
 
-Then, in order — the second step is the one people miss:
+In Render: **New → Blueprint** → select `kaya-a2a-test-agent`.
 
-1. First deploy succeeds; note the URL, e.g. `https://kaya-a2a-test.onrender.com`.
-2. **Set `PUBLIC_BASE_URL` to that URL and redeploy.** The card's `url` field is built from it.
-   Leave it as `localhost` and KAYA fetches the card fine, then fails to invoke — which looks
-   like a KAYA bug and isn't.
-3. Copy the generated `A2A_TOKEN` from Environment.
-4. Verify before sharing:
+Then:
+
+1. First deploy succeeds; note the URL, e.g. `https://kaya-a2a-test-agent.onrender.com`.
+   The card's `url` field is set from `RENDER_EXTERNAL_URL` automatically — no manual step.
+2. Copy the generated `A2A_TOKEN` from Environment.
+3. Verify before sharing:
 
 ```bash
-BASE=https://kaya-a2a-test.onrender.com TOKEN=<token> bash acceptance.sh
+BASE=https://kaya-a2a-test-agent.onrender.com TOKEN=<token> bash acceptance.sh
 # expect: 13 passed, 0 failed
 ```
 
-5. Share:
-   - no-auth card → `https://kaya-a2a-test.onrender.com/open/.well-known/agent-card.json`
-   - bearer card → `https://kaya-a2a-test.onrender.com/secure/.well-known/agent-card.json`
+4. Share:
+   - no-auth card → `https://kaya-a2a-test-agent.onrender.com/open/.well-known/agent-card.json`
+   - bearer card → `https://kaya-a2a-test-agent.onrender.com/secure/.well-known/agent-card.json`
 
 ## Security note
 

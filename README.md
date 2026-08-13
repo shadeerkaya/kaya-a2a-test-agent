@@ -41,14 +41,15 @@ curl -s http://localhost:10000/ | jq          # lists both card + endpoint URLs
 
 ## Deploy (Render free tier — recommended)
 
-1. Push this directory to a GitHub repo.
-2. Render → **New Web Service** → connect the repo. `render.yaml` is picked up automatically.
-3. After the first deploy, set `PUBLIC_BASE_URL` to the real URL
-   (`https://<service>.onrender.com`) and redeploy.
-   **This matters:** `PUBLIC_BASE_URL` becomes the card's `url` field. If it still says
-   `localhost`, KAYA will fetch the card fine and then fail to invoke it.
-4. Read the generated `A2A_TOKEN` from the Render dashboard → Environment.
-5. Share the two card URLs.
+Repo is already pushed: <https://github.com/shadeerkaya/kaya-a2a-test-agent>
+
+1. Sign in to Render with **GitHub** (one click, no password typing).
+2. **New → Blueprint**, pick `kaya-a2a-test-agent`. `render.yaml` configures everything.
+3. Read the generated `A2A_TOKEN` from **Environment**.
+4. Share the two card URLs.
+
+No `PUBLIC_BASE_URL` step — `app.py` reads `RENDER_EXTERNAL_URL`, which Render injects, so the
+card's `url` field is correct on the first deploy.
 
 Free tier sleeps after 15 min idle, ~1 min cold start. Hit `/healthz` to wake it before a demo,
 or keep it warm with a cron ping.
