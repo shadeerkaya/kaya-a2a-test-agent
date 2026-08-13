@@ -1,4 +1,5 @@
+# Do NOT pin fastapi/starlette here: HF Spaces forces its own gradio version,
+# and gradio 6.x needs starlette>=1.0 while fastapi 0.115 caps it at <0.42.
+# Let pip resolve them from gradio. Verified 13/13 on fastapi 0.141/starlette 1.6.
 a2a-sdk[http-server]==0.3.26
-fastapi==0.115.6
-uvicorn[standard]==0.34.0
-gradio>=5,<7
+gradio==6.24.0
